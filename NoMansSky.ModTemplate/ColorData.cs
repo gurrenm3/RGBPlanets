@@ -3,42 +3,31 @@ using Reloaded.ModHelper;
 
 namespace NoMansSky.ModTemplate
 {
+    /// <summary>
+    /// This class is used to track colors and apply the actual changes to them.
+    /// </summary>
     class ColorData
     {
         const float colorChangeAmount = 0.003f;
+
+        // these variables track whether or not this color is counting down from 1 to 0.
         private bool rCountingDown;
         private bool gCountingDown;
         private bool bCountingDown;
-
-        private float previousR;
-        private float previousG;
-        private float previousB;
-
-        private bool isInit = false;
 
         public ColorData()
         {
 
         }
 
-        public ColorData(float r, float g, float b)
-        {
-            previousR = r;
-            previousG = g;
-            previousB = b;
-            isInit = true;
-        }
-
+        /// <summary>
+        /// Actually modifies the color, adjusting it slightly in the opposite direction.
+        /// </summary>
+        /// <param name="colorToModify"></param>
+        /// <returns></returns>
         public Colour ModifyColor(Colour colorToModify)
         {
-            if (!isInit)
-            {
-                previousR = colorToModify.R;
-                previousG = colorToModify.G;
-                previousB = colorToModify.B;
-                isInit = true;
-            }
-
+            // adjust R values
             colorToModify.R += rCountingDown ? -colorChangeAmount : colorChangeAmount;
             if (colorToModify.R <= 0f)
             {
@@ -51,6 +40,8 @@ namespace NoMansSky.ModTemplate
                 rCountingDown = true;
             }
 
+
+            // adjust G values
             colorToModify.G += gCountingDown ? -colorChangeAmount : colorChangeAmount;
             if (colorToModify.G <= 0f)
             {
@@ -63,6 +54,8 @@ namespace NoMansSky.ModTemplate
                 gCountingDown = true;
             }
 
+
+            // adjust B values
             colorToModify.B += bCountingDown ? -colorChangeAmount : colorChangeAmount;
             if (colorToModify.B <= 0f)
             {
@@ -75,6 +68,8 @@ namespace NoMansSky.ModTemplate
                 bCountingDown = true;
             }
 
+
+            // return modified color
             return colorToModify;
         }
     }

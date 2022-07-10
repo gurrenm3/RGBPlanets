@@ -14,9 +14,17 @@ namespace NoMansSky.ModTemplate
     /// </summary>
     public class Mod : NMSMod
     {
-        int framesBetweenUpdates = 3;
-        int frameCount = 0;
+        /// <summary>
+        /// Initializes your mod along with some necessary info.
+        /// </summary>
+        public Mod(IModConfig _config, IReloadedHooks _hooks, IModLogger _logger) : base(_config, _hooks, _logger)
+        {
 
+        }
+
+        /// <summary>
+        /// Contains the name of each color variable and it's associated color data.
+        /// </summary>
         Dictionary<string, ColorData> colorDataByName = new Dictionary<string, ColorData>()
         {
             { "CloudColour1", new ColorData() },
@@ -31,50 +39,45 @@ namespace NoMansSky.ModTemplate
             { "SunColour", new ColorData() }
         };
 
-        /// <summary>
-        /// Initializes your mod along with some necessary info.
-        /// </summary>
-        public Mod(IModConfig _config, IReloadedHooks _hooks, IModLogger _logger) : base(_config, _hooks, _logger)
-        {
-            
-        }
+        int framesBetweenUpdates = 3;
+        int frameCount = 0;
 
         /// <summary>
         /// Called once every frame.
         /// </summary>
         public async override void Update()
         {
+            // don't run this unless we're in game.
             if (!Game.IsInGame)
                 return;
 
+            // don't run this every frame. Give it a little time for the next color change so it looks smooth.
             frameCount++;
             if (frameCount <= framesBetweenUpdates)
                 return;
 
+            // Modify day colors. Use async version so it doesn't lock game.
             await Game.Colors.DaySkyColors.ModifyAsync<GcWeatherColourSettings>(colorSettings =>
             {
                 foreach (var setting in colorSettings.GenericSettings.Settings)
-                {
                     ModifyColorSetting(setting);
-                }
             });
 
+            // Modify dusk colors. Use async version so it doesn't lock game.
             await Game.Colors.DuskSkyColors.ModifyAsync<GcWeatherColourSettings>(colorSettings =>
             {
                 foreach (var setting in colorSettings.GenericSettings.Settings)
-                {
                     ModifyColorSetting(setting);
-                }
             });
 
+            // Modify night colors. Use async version so it doesn't lock game.
             await Game.Colors.NightSkyColors.ModifyAsync<GcWeatherColourSettings>(colorSettings =>
             {
                 foreach (var setting in colorSettings.GenericSettings.Settings)
-                {
                     ModifyColorSetting(setting);
-                }
             });
 
+            // reset frame count
             frameCount = 0;
         }
 
@@ -108,7 +111,7 @@ namespace NoMansSky.ModTemplate
             if (colorDataByName.TryGetValue(settingName, out var colorData))
                 return colorData;
 
-            colorData = new ColorData(colour.R, colour.G, colour.B);
+            colorData = new ColorData();
             colorDataByName.Add(settingName, colorData);
             return colorData;
         }
